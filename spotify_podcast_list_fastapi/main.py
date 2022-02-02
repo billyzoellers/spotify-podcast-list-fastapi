@@ -7,7 +7,6 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 import spotipy
-from spotipy.oauth2 import SpotifyOAuth
 import os
 from spotify_podcast_list_fastapi.helpers import new_sp_aouth, validate_token
 from dotenv import load_dotenv
