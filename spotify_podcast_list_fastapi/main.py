@@ -15,14 +15,13 @@ import os
 CLIENT_ID = os.getenv("SPOTIPY_CLIENT_ID")
 CLIENT_SEC = os.getenv("SPOTIPY_CLIENT_SECRET")
 APP_URI = os.getenv("APP_URI")
-API_BASE = 'https://accounts.spotify.com'
+SECRET = os.getenv("SECRET")
 REDIRECT_URI = f'{APP_URI}/callback'
 SCOPE = 'user-library-read,user-read-playback-position'
-SHOW_DIALOG = False
 PAGE_SIZE = 50
 
 app = FastAPI()
-app.add_middleware(SessionMiddleware, secret_key="example")
+app.add_middleware(SessionMiddleware, secret_key=SECRET)
 app.mount("/static", StaticFiles(directory="spotify_podcast_list_fastapi/static"), name="static")
 
 templates = Jinja2Templates(directory="spotify_podcast_list_fastapi/templates")
