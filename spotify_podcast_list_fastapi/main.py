@@ -45,7 +45,7 @@ async def root(request: Request):
             break
     return templates.TemplateResponse("index.html", {"request": request, "shows": shows, "current_user": current_user})
 
-@app.get("/show/{show_id}") 
+@app.get("/show/{show_id}", response_class=HTMLResponse) 
 async def read_show(request: Request, show_id: str):
     request.session['token'], authorized = get_token(request.session)
     if not authorized:
