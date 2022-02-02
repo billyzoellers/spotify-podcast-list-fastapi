@@ -6,6 +6,11 @@ authors = ["Billy Zoellers <billy.zoellers@mac.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
+fastapi = "^0.73.0"
+uvicorn = {extras = ["standard"], version = "^0.17.1"}
+spotipy = "^2.19.0"
+itsdangerous = "^2.0.1"
+Jinja2 = "^3.0.3"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

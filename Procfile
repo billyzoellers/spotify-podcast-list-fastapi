@@ -1,0 +1,1 @@
+web: uvicorn spotify_podcast_list_fastapi.main:app --host=0.0.0.0 --port=${PORT}
