@@ -11,6 +11,7 @@ uvicorn = {extras = ["standard"], version = "^0.17.1"}
 spotipy = "^2.19.0"
 itsdangerous = "^2.0.1"
 Jinja2 = "^3.0.3"
+python-dotenv = "^0.19.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

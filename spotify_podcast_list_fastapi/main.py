@@ -6,29 +6,25 @@ from fastapi.responses import RedirectResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
-import time
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 import os
+from spotify_podcast_list_fastapi.helpers import new_sp_aouth, validate_token
+from dotenv import load_dotenv
 
 ## App params
-CLIENT_ID = os.getenv("SPOTIPY_CLIENT_ID")
-CLIENT_SEC = os.getenv("SPOTIPY_CLIENT_SECRET")
-APP_URI = os.getenv("APP_URI")
-SECRET = os.getenv("SECRET")
-REDIRECT_URI = f'{APP_URI}/callback'
-SCOPE = 'user-library-read,user-read-playback-position'
+load_dotenv()
 PAGE_SIZE = 50
 
 app = FastAPI()
-app.add_middleware(SessionMiddleware, secret_key=SECRET)
+app.add_middleware(SessionMiddleware, secret_key=os.getenv("SECRET"))
 app.mount("/static", StaticFiles(directory="spotify_podcast_list_fastapi/static"), name="static")
 
 templates = Jinja2Templates(directory="spotify_podcast_list_fastapi/templates")
 
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request):
-    request.session['token'], authorized = get_token(request.session)
+    request.session['token'], authorized = validate_token(request.session)
     if not authorized:
         return RedirectResponse("/verify")
 
@@ -47,7 +43,7 @@ async def root(request: Request):
 
 @app.get("/show/{show_id}", response_class=HTMLResponse) 
 async def read_show(request: Request, show_id: str):
-    request.session['token'], authorized = get_token(request.session)
+    request.session['token'], authorized = validate_token(request.session)
     if not authorized:
         return RedirectResponse("/verify")
 
@@ -73,52 +69,14 @@ async def read_show(request: Request, show_id: str):
 
 @app.get("/verify")
 async def verify():
-    sp_oauth = SpotifyOAuth(
-        client_id=CLIENT_ID,
-        client_secret=CLIENT_SEC,
-        redirect_uri=REDIRECT_URI,
-        scope=SCOPE,
-    )
+    sp_oauth = new_sp_aouth()
     auth_url = sp_oauth.get_authorize_url()
 
     return RedirectResponse(auth_url)
 
 @app.get("/callback")
 async def callback(request: Request, code: str):
-    sp_oauth = SpotifyOAuth(
-        client_id=CLIENT_ID,
-        client_secret=CLIENT_SEC,
-        redirect_uri=REDIRECT_URI,
-        scope=SCOPE,
-    )
+    sp_oauth = new_sp_aouth()
     token = sp_oauth.get_access_token(code)
     request.session["token"] = token
     return RedirectResponse("/")
-
-# TODO: rewrite
-def get_token(session):
-  token_valid = False
-  token = session.get("token", {})
-
-  # Checking if the session already has a token stored
-  if not (session.get('token', False)):
-      token_valid = False
-      return token, token_valid
-
-  # Checking if token has expired
-  now = int(time.time())
-  is_token_expired = session.get('token').get('expires_at') - now < 60
-
-  # Refreshing token if it has expired
-  if (is_token_expired):
-      # Don't reuse a SpotifyOAuth object because they store token info and you could leak user tokens if you reuse a SpotifyOAuth object
-      sp_oauth = SpotifyOAuth(
-        client_id = CLIENT_ID,
-        client_secret = CLIENT_SEC,
-        redirect_uri = REDIRECT_URI,
-        scope = SCOPE
-      )
-      token = sp_oauth.refresh_access_token(session.get('token').get('refresh_token'))
-
-  token_valid = True
-  return token, token_valid
