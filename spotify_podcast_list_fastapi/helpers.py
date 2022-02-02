@@ -5,6 +5,7 @@ import time
 import os
 from spotipy.oauth2 import SpotifyOAuth
 
+
 def new_sp_aouth() -> SpotifyOAuth:
     """
     Return a new instance of the SpotifyOAuth object
@@ -13,9 +14,10 @@ def new_sp_aouth() -> SpotifyOAuth:
         "client_id": os.getenv("SPOTIPY_CLIENT_ID"),
         "client_secret": os.getenv("SPOTIPY_CLIENT_SECRET"),
         "redirect_uri": f'{os.getenv("APP_URI")}/callback',
-        "scope": 'user-library-read,user-read-playback-position',
+        "scope": "user-library-read,user-read-playback-position",
     }
     return SpotifyOAuth(*params)
+
 
 def validate_token(session) -> tuple:
     """
@@ -29,10 +31,10 @@ def validate_token(session) -> tuple:
 
     # If token has expired, refresh token
     now = int(time.time())
-    token_expired = token.get('expires_at') - now < 60
+    token_expired = token.get("expires_at") - now < 60
     if token_expired:
         sp_oauth = new_sp_aouth()
-        token = sp_oauth.refresh_access_token(token.get('refresh_token'))
+        token = sp_oauth.refresh_access_token(token.get("refresh_token"))
 
     token_valid = True
     return token, token_valid
