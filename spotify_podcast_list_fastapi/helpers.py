@@ -16,7 +16,7 @@ def new_sp_aouth() -> SpotifyOAuth:
         "redirect_uri": f'{os.getenv("APP_URI")}/callback',
         "scope": "user-library-read,user-read-playback-position",
     }
-    return SpotifyOAuth(*params)
+    return SpotifyOAuth(**params)
 
 
 def validate_token(session) -> tuple:
